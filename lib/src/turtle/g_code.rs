@@ -23,14 +23,14 @@ impl<'input> GCodeTurtle<'input> {
         match (svg_arc.flags.large_arc, svg_arc.flags.sweep) {
             (false, true) => command!(CounterclockwiseCircularInterpolation {
                 X: svg_arc.to.x,
-                Y: svg_arc.to.y,
+                Y: -svg_arc.to.y,
                 R: svg_arc.radii.x,
                 F: self.feedrate,
             })
             .into_token_vec(),
             (false, false) => command!(ClockwiseCircularInterpolation {
                 X: svg_arc.to.x,
-                Y: svg_arc.to.y,
+                Y: -svg_arc.to.y,
                 R: svg_arc.radii.x,
                 F: self.feedrate,
             })
@@ -80,7 +80,7 @@ impl<'input> Turtle for GCodeTurtle<'input> {
     fn move_to(&mut self, to: Point<f64>) {
         self.tool_off();
         self.program
-            .append(&mut command!(RapidPositioning { X: to.x, Y: to.y }).into_token_vec());
+            .append(&mut command!(RapidPositioning { X: to.x, Y: -to.y }).into_token_vec());
     }
 
     fn line_to(&mut self, to: Point<f64>) {
@@ -88,7 +88,7 @@ impl<'input> Turtle for GCodeTurtle<'input> {
         self.program.append(
             &mut command!(LinearInterpolation {
                 X: to.x,
-                Y: to.y,
+                Y: -to.y,
                 F: self.feedrate,
             })
             .into_token_vec(),
